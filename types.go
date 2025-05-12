@@ -486,7 +486,8 @@ func (u *UnsafePointer) Store(value unsafe.Pointer) {
 
 // provided by runtime
 //
-//go:linkname storePointer
+//go:nosplit
+//go:linkname storePointer runtime.atomic_storePointer
 func storePointer(ptr *unsafe.Pointer, new unsafe.Pointer)
 
 // CompareAndSwapNoWB atomically (with respect to other methods)
@@ -512,6 +513,8 @@ func (u *UnsafePointer) CompareAndSwap(old, new unsafe.Pointer) bool {
 	return casPointer(&u.value, old, new)
 }
 
+//go:nosplit
+//go:linkname casPointer runtime.atomic_casPointer
 func casPointer(ptr *unsafe.Pointer, old, new unsafe.Pointer) bool
 
 // Pointer is an atomic pointer of type *T.
