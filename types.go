@@ -4,7 +4,10 @@
 
 package atomic
 
-import "unsafe"
+import (
+	"sync/atomic"
+	"unsafe"
+)
 
 // Int32 is an atomically accessed int32 value.
 //
@@ -481,14 +484,15 @@ func (u *UnsafePointer) StoreNoWB(value unsafe.Pointer) {
 
 // Store updates the value atomically.
 func (u *UnsafePointer) Store(value unsafe.Pointer) {
-	storePointer(&u.value, value)
+	//storePointer(&u.value, value)
+	atomic.StorePointer(&u.value, value)
 }
 
-// provided by runtime
-//
-//go:nosplit
-//go:linkname storePointer runtime.atomic_storePointer
-func storePointer(ptr *unsafe.Pointer, new unsafe.Pointer)
+//// provided by runtime
+////
+////go:nosplit
+////go:linkname storePointer runtime.atomic_storePointer
+//func storePointer(ptr *unsafe.Pointer, new unsafe.Pointer)
 
 // CompareAndSwapNoWB atomically (with respect to other methods)
 // compares u's value with old, and if they're equal,
@@ -510,12 +514,13 @@ func (u *UnsafePointer) CompareAndSwapNoWB(old, new unsafe.Pointer) bool {
 // and if they're equal, swaps u's value with new.
 // It reports whether the swap ran.
 func (u *UnsafePointer) CompareAndSwap(old, new unsafe.Pointer) bool {
-	return casPointer(&u.value, old, new)
+	return atomic.CompareAndSwapPointer(&u.value, old, new)
+	//return casPointer(&u.value, old, new)
 }
 
-//go:nosplit
-//go:linkname casPointer runtime.atomic_casPointer
-func casPointer(ptr *unsafe.Pointer, old, new unsafe.Pointer) bool
+////go:nosplit
+////go:linkname casPointer runtime._atomic_SwapPointer
+//func casPointer(ptr *unsafe.Pointer, old, new unsafe.Pointer) bool
 
 // Pointer is an atomic pointer of type *T.
 type Pointer[T any] struct {

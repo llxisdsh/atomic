@@ -209,3 +209,16 @@ func BenchmarkXchg64(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkCAS64(b *testing.B) {
+	var x atomic.Pointer[uint64]
+	y := uint64(1)
+	x.Store(&y)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			y := x.Load()
+			*y += 1
+			x.CompareAndSwapNoWB(x.Load(), y)
+		}
+	})
+}
